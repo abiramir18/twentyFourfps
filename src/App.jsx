@@ -12,7 +12,7 @@ import SignUp from './SignUp';
 import Login from './Login';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
   const [watchlist, setWatchlist] = useState([]);
   const [watched, setWatched] = useState([]);
   const [comedy,setComedy] = useState([]);
@@ -28,7 +28,7 @@ function App() {
   const logout = ()=>{
     localStorage.removeItem("token");
     setToken(null);
-    window.location.href("/login");
+    window.location.href = "/login";
   }
   useEffect(() => {
     const fetchData = async () => {
@@ -84,9 +84,10 @@ function App() {
         console.log("error while fetching data:", error);
       }
     };
-    
-    fetchData();
-  }, []);
+    if(token){
+      fetchData();
+    }
+  }, [token]);
 
   
   const handleAddToWatchlist = async (movie) => {
@@ -95,11 +96,10 @@ function App() {
     try{
       if (isInWatchlist){
         setWatchlist((prev)=> prev.filter((item)=>item.id !== movie.id));
-        await axios.delete(`http://localhost:3000/watchlist/`,{movieId: movie.id, username :username},{
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
+        await axios.delete(`http://localhost:3000/watchlist/`,{
+          data: { movieId: movie.id,username :username },
+          headers: { Authorization: `Bearer ${token}`}
+        });
       }
       else{
         if (watched.some(item => item.id === movie.id)){
@@ -111,7 +111,7 @@ function App() {
           });
         }
         setWatchlist((prev) =>  [...prev, movie]);
-        await axios.post(`http://localhost:3000/addToWatchlist`, {movieId: movie.id, usernmae :username},{
+        await axios.post(`http://localhost:3000/addToWatchlist`, {movieId: movie.id, username :username},{
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -128,20 +128,18 @@ function App() {
     const previousWatched = watched;
     try{
       if (isInWatched){
-      setWatched((prev)=> prev.filter((item)=>item.id !== movie.id));
-      await axios.delete(`http://localhost:3000/deleteFromWatched/`,{movieId: movie.id,username :username},{
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
+        setWatched((prev)=> prev.filter((item)=>item.id !== movie.id));
+        await axios.delete(`http://localhost:3000/deleteFromWatched/`,{
+          data: { movieId: movie.id,username :username },
+          headers: { Authorization: `Bearer ${token}`}
+        });
       }
       else{
         if (watchlist.some(item => item.id === movie.id)){
           setWatchlist((prev)=> prev.filter((item)=>item.id !== movie.id));
-          await axios.delete(`http://localhost:3000/deleteFromWatchlist/`,{movieId: movie.id,username :username},{
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
+          await axios.delete(`http://localhost:3000/deleteFromWatchlist/`,{
+            data: { movieId: movie.id,username :username },
+            headers: { Authorization: `Bearer ${token}`}
           });
         }
         setWatched((prev) =>  [...prev, movie]);
