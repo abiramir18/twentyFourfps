@@ -12,9 +12,11 @@ export default function SignUp({ setIsAuthenticated, setUsername, setToken}){
             console.log(data);
             const res = await axios.post("http://localhost:3000/api/auth/signup",data);
             console.log(res);
-            setIsAuthenticated(true);
-            setUsername(data.username);
-            setToken(res.token);
+            if (res.data && res.data.token) {
+                setIsAuthenticated(true);
+                setUsername(data.username);
+                setToken(res.data.token);
+            }
         }
         catch (error) {
             console.error("Signup error:", error);

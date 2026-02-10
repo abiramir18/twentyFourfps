@@ -13,8 +13,10 @@ export default function Login({ setIsAuthenticated, setToken }){
             console.log(data);
             const res = await axios.post("http://localhost:3000/api/auth/login",data); 
             console.log(res);
-            setToken(res.token);
-            setIsAuthenticated(true);
+            if (res.data && res.data.token) {
+                setToken(res.data.token);
+                setIsAuthenticated(true);
+            }
         } catch (error) {
             console.error("Signup error:", error);
             if(error.response && error.response.data){
