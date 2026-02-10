@@ -11,17 +11,18 @@ export default function SignUp({ setIsAuthenticated, setUsername }){
         try {
             console.log(data);
             const res = await axios.post("http://localhost:3000/api/auth/signup",data);
-            if (res.ok){
-                console.log(res);
-                setIsAuthenticated(true);
-                setUsername(data.username);
+            console.log(res);
+            setIsAuthenticated(true);
+            setUsername(data.username);
+        }
+        catch (error) {
+            console.error("Signup error:", error);
+            if (error.response && error.response.data){
+                setErrorMessage(error.response.data.message || "Signup failed");
             }
             else{
-                setErrorMessage("User already registered.");
+                setErrorMessage("Server is unreachabel.")
             }
-
-        } catch (error) {
-            console.error("Signup error:", error);
         }
     };
     return (

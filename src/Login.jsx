@@ -12,16 +12,16 @@ export default function Login({ setIsAuthenticated }){
         try {
             console.log(data);
             const res = await axios.post("http://localhost:3000/api/auth/login",data); 
-            if (res.ok){
-                console.log(res);
-                setIsAuthenticated(true);
-            }
-            else{
-                setErrorMessage("Incorrect username or password.");
-                reset();
-            }
+            console.log(res);
+            setIsAuthenticated(true);
         } catch (error) {
             console.error("Signup error:", error);
+            if(error.response && error.response.data){
+                setErrorMessage(error.response.data.message || "Login failed");
+            }
+            else{
+                setErrorMessage("Server is unreachable.");
+            }
         }
     };
     return (
